@@ -91,7 +91,7 @@ class QuietStar(nn.Module):
     logits = res.logits[:,-1,:]
     past_key_values = res.past_key_values
     hidden = res.hidden_states[:,-1,:] # hidden.shape = (batch, hidden_dim)
-    return logits, hidden, past_key_values
+    return logits, hidden[-1], past_key_values
   def thoughful_forward(self,
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
@@ -121,7 +121,7 @@ class QuietStar(nn.Module):
     res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True, output_hidden_states = True)
     logits = res.logits[:,-1,:] # logits.shape = (batch, vocab_size)
     hidden = res.hidden_states[:,-1,:] # hidden.shape = (batch, hidden_dim)
-    return logits, hidden, past_key_values
+    return logits, hidden[-1], past_key_values
 
 if __name__ == "__main__":
   qs = QuietStar('meta-llama/Meta-Llama-3.1-8B-Instruct').to('cuda')
