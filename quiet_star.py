@@ -120,6 +120,7 @@ class QuietStar(nn.Module):
       attention_mask = torch.cat([attention_mask, torch.ones((b,2), device = next(self.model.parameters()).device, dtype = torch.int64)], dim = 1)
     res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True, output_hidden_states = True)
     logits = res.logits[:,-1,:] # logits.shape = (batch, vocab_size)
+    past_key_values = res.past_key_values
     hidden = res.hidden_states[-1][:,-1,:] # hidden.shape = (batch, hidden_dim)
     return logits, hidden, past_key_values
 
