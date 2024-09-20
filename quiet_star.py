@@ -60,7 +60,7 @@ class QuietStar(nn.Module):
     # logits.shape = (batch, vocab_size)
     logits_processor = LogitsProcessorList()
     logits_processor.append(TemperatureLogitsWarper(temperature))
-    if top_p != 1: logits_processor.append(TopPLogitsWarper(top_p))
+    if top_k == -1: logits_processor.append(TopPLogitsWarper(top_p))
     else: logits_processor.append(TopKLogitsWarper(top_k))
     logits_processor.append(SuppressTokensLogitsProcessor([self.start_thought_token_id, self.end_thought_token_id]))
     logits = logits_processor(input_ids, scores = logits) # logits.shape = (batch, vocab_size)
