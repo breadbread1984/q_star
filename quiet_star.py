@@ -30,7 +30,7 @@ class QuietStar(nn.Module):
       tok_emb.weight[self.start_thought_token_id, :] = init_value
       tok_emb.weight[self.end_thought_token_id, :] = init_value
     # set only new embedding vector are trainable
-    trainability_mask = torch.zeros_like(tok_emb,weight, device = next(tok_emb.parameters()).device())
+    trainability_mask = torch.zeros_like(tok_emb.weight, device = next(tok_emb.parameters()).device())
     trainability_mask[self.start_thought_token_id] = 100.0
     trainability_mask[self.end_thought_token_id] = 100.0
     tok_emb.weight.register_hook(lambda grad: grad * trainability_mask)
