@@ -92,7 +92,7 @@ class QuietStar(nn.Module):
     past_key_values = res.past_key_values
     hidden = res.hidden_states[-1][:,-1,:] # hidden.shape = (batch, hidden_dim)
     return logits, hidden, past_key_values
-  def thoughful_forward(self,
+  def thoughtful_forward(self,
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
               past_key_values: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None,
