@@ -81,7 +81,7 @@ class QuietStar(nn.Module):
     logits_thought, hidden_thought, _ = self.thoughtful_forward(input_ids, attention_mask, past_key_values, do_sample, temperature, top_k, top_p)
     w = self.mixing_mlp(torch.cat([hidden, hidden_thought], dim = -1)) # w.shape = (batch, 1)
     weighted_logits = w * logits + (1. - w) * logits_thought # weighed_logits.shape = (batch, vocab_size)
-    tokens = self.sample_token(input_ids, weighted_logits) # tokens.shape = (batch, 1)
+    tokens = self.sample_token(input_ids, weighted_logits, do_sample, temperature, top_k, top_p) # tokens.shape = (batch, 1)
     return tokens, updated_past_key_values
   def original_forward(self,
               input_ids: torch.Tensor,
