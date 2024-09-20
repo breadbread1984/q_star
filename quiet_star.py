@@ -63,6 +63,7 @@ class QuietStar(nn.Module):
     if top_k == -1: logits_processor.append(TopPLogitsWarper(top_p))
     else: logits_processor.append(TopKLogitsWarper(top_k))
     logits_processor.append(SuppressTokensLogitsProcessor([self.start_thought_token_id, self.end_thought_token_id]))
+    logits_processor = logits_processor.to(logits.device)
     logits = logits_processor(input_ids, scores = logits) # logits.shape = (batch, vocab_size)
     if do_sample:
       tokens = torch.distributions.categorical.Categorical(logits = logits).sample().unsqueeze(-1) # tokens.shape = (batch, 1)
