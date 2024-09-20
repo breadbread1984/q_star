@@ -56,7 +56,7 @@ class QuietStar(nn.Module):
       nn.ReLU(),
       nn.Linear(2 * self.model.config.hidden_size, 1),
       nn.Sigmoid()).to(next(self.model.parameters()).device)
-  def sample_token(self, input_ids, logits, do_sample: bool = False, temperature: float = 0.7, top_k: float = -1, top_p: float = 1):
+  def sample_token(self, input_ids, logits, do_sample: bool = False, temperature: float = 0.7, top_k: int = -1, top_p: float = 1):
     # logits.shape = (batch, vocab_size)
     logits_processor = LogitsProcessorList()
     logits_processor.append(TemperatureLogitsWarper(temperature))
