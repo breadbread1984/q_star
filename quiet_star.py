@@ -87,7 +87,7 @@ class QuietStar(nn.Module):
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
               past_key_values: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None):
-    res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True)
+    res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True, output_hidden_states = True)
     logits = res.logits[:,-1,:]
     past_key_values = res.past_key_values
     hidden = res.hidden_states[:,-1,:] # hidden.shape = (batch, hidden_dim)
@@ -108,7 +108,7 @@ class QuietStar(nn.Module):
     for _ in range(self.config['thought_length']):
       if attention_mask is not None:
         attention_mask = torch.cat([attention_mask, torch.ones((b,1), device = next(self.model.parameters()).device, dtype = torch.int64)], dim = 1) # attention_mask.shape = (batch, seq_len + i)
-      res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True)
+      res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True, output_hidden_states = True)
       logits = res.logits[:,-1,:] # logits.shape = (batch, vocab_size)
       past_key_values = res.past_key_values
       next_token = self.sample_token(input_ids, logits, do_sample, temperature, top_k, top_p) # next_token.shape = (batch, 1)
@@ -118,7 +118,7 @@ class QuietStar(nn.Module):
     input_ids = torch.cat([input_ids, end_thought_token], dim = 1)
     if attention_mask is not None:
       attention_mask = torch.cat([attention_mask, torch.ones((b,2), device = next(self.model.parameters()).device, dtype = torch.int64)], dim = 1)
-    res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True)
+    res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True, output_hidden_states = True)
     logits = res.logits[:,-1,:] # logits.shape = (batch, vocab_size)
     hidden = res.hidden_states[:,-1,:] # hidden.shape = (batch, hidden_dim)
     return logits, hidden, past_key_values
