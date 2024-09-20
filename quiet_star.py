@@ -3,7 +3,7 @@
 from typing import List, Optional, Tuple, Union
 import torch
 from torch import nn
-from transformers import AutoTokenizer, AutoModelForCausalLM, \
+from transformers import AutoTokenizer, AutoModelForCausalLM, Cache, \
 LogitsProcessorList, TemperatureLogitsWarper, TopKLogitsWarper, TopPLogitsWarper, SuppressTokensLogitsProcessor
 
 class QuietStar(nn.Module):
@@ -72,7 +72,7 @@ class QuietStar(nn.Module):
   def forward(self,
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
-              past_key_values: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None,
+              past_key_values: Optional[Union[Cache,List[torch.FloatTensor]]] = None,
               do_sample: bool = False,
               temperature: float = 0.7,
               top_k: int = -1,
@@ -86,7 +86,7 @@ class QuietStar(nn.Module):
   def original_forward(self,
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
-              past_key_values: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None):
+              past_key_values: Optional[Union[Cache,List[torch.FloatTensor]]] = None):
     res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True, output_hidden_states = True)
     logits = res.logits[:,-1,:]
     past_key_values = res.past_key_values
@@ -95,7 +95,7 @@ class QuietStar(nn.Module):
   def thoughtful_forward(self,
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
-              past_key_values: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None,
+              past_key_values: Optional[Union[Cache,List[torch.FloatTensor]]] = None,
               do_sample: bool = False,
               temperature: float = 0.7,
               top_k: int = -1,
