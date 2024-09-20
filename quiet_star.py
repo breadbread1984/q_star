@@ -71,8 +71,8 @@ class QuietStar(nn.Module):
               attention_mask: Optional[torch.Tensor] = None,
               past_key_values: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None,
               do_sample: bool = False,
-              temperature: float = 0.7
-              top_k: float = -1,
+              temperature: float = 0.7,
+              top_k: int = -1,
               top_p: float = 1):
     logits, hidden, past_key_values = self.original_forward(input_ids, attention_mask, past_key_values)
     logits_thought, hidden_thought, _ = self.thoughtful_forward(input_ids, attention_mask, past_key_values, do_sample, temperature, top_k, top_p)
@@ -94,8 +94,8 @@ class QuietStar(nn.Module):
               attention_mask: Optional[torch.Tensor] = None,
               past_key_values: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None,
               do_sample: bool = False,
-              temperature: float = 0.7
-              top_k: float = -1,
+              temperature: float = 0.7,
+              top_k: int = -1,
               top_p: float = 1):
     b, l = x.shape
     start_thought_token = torch.full((b, 1), self.start_thought_token_id, device = next(self.model.parameters()).device, dtype = torch.int64)
