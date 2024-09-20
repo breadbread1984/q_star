@@ -79,7 +79,7 @@ class QuietStar(nn.Module):
     w = self.mixing_head(torch.cat([hidden, hidden_thought], dim = -1)) # w.shape = (batch, 1)
     weighted_logits = w * logits + (1. - w) * logits_thought # weighed_logits.shape = (batch, vocab_size)
     tokens = self.sample_token(input_ids, weighted_logits) # tokens.shape = (batch, 1)
-    return tokens
+    return tokens, past_key_values
   def original_forward(self,
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
@@ -119,3 +119,11 @@ class QuietStar(nn.Module):
     logits = res.logits[:,-1,:] # logits.shape = (batch, vocab_size)
     hidden = res.hidden_states[:,-1,:] # hidden.shape = (batch, hidden_dim)
     return logits, hidden, past_key_values
+
+if __name__ == "__main__":
+  qs = QuietStar('meta-llama/Meta-Llama-3.1-8B-Instruct').to('cuda')
+  tokenizer = qs.tokenizer
+  encode = tokenizer(['hello the world!', 'good morning!'], padding = True, return_tensors = 'pt')
+  input_ids, attention_mask = encode['input_ids'].to('cuda'), encode['attention_mask'].to('cuda')
+  tokens, past_key_values = qs.forward(input_ids, attention_mask, past_key_values = None)
+
