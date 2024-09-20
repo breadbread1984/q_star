@@ -100,7 +100,7 @@ class QuietStar(nn.Module):
               temperature: float = 0.7,
               top_k: int = -1,
               top_p: float = 1):
-    b, l = x.shape
+    b, l = input_ids.shape
     start_thought_token = torch.full((b, 1), self.start_thought_token_id, device = next(self.model.parameters()).device, dtype = torch.int64)
     # 推理thought第一个token
     input_ids = torch.cat([input_ids, start_thought_token], dim = 1) # x.shape = (batch, seq_len + 1)
