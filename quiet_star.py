@@ -12,6 +12,9 @@ class QuietStar(nn.Module):
     self.config = config
     self.model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code = True)
     self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+    if self.tokenizer.pad_token_id is None:
+      self.tokenizer.pad_token_id = self.tokenizer.bos_token_id
+      self.tokenizer.pad_token = self.tokenizer.bos_token
     # 1) 向tokenizer添加thought start和thought end两个token
     num_added_tokens = self.tokenizer.add_special_tokens({"additional_special_tokens": ["<|startofthought|>","<|endofthought|>"]})
     assert num_added_tokens == 2
