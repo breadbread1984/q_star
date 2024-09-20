@@ -74,7 +74,12 @@ class QuietStar(nn.Module):
               temperature: float = 0.7
               top_k: float = -1,
               top_p: float = 1):
-    pass
+    logits, hidden, past_key_values = self.original_forward(input_ids, attention_mask, past_key_values)
+    logits_thought, hidden_thought, _ = self.thoughtful_forward(input_ids, attention_mask, past_key_values, do_sample, temperature, top_k, top_p)
+    w = self.mixing_head(torch.cat([hidden, hidden_thought], dim = -1)) # w.shape = (batch, 1)
+    weighted_logits = w * logits + (1. - w) * logits_thought # weighed_logits.shape = (batch, vocab_size)
+    tokens = self.sample_token(input_ids, weighted_logits) # tokens.shape = (batch, 1)
+    return tokens
   def original_forward(self,
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
@@ -82,7 +87,8 @@ class QuietStar(nn.Module):
     res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True)
     logits = res.logits[:,-1,:]
     past_key_values = res.past_key_values
-    return logits, past_key_values
+    hidden = res.hidden_states[:,-1,:] # hidden.shape = (batch, hidden_dim)
+    return logits, hidden, past_key_values
   def thoughful_forward(self,
               input_ids: torch.Tensor,
               attention_mask: Optional[torch.Tensor] = None,
@@ -111,4 +117,5 @@ class QuietStar(nn.Module):
       attention_mask = torch.cat([attention_mask, torch.ones((b,2), device = next(self.model.parameters()).device, dtype = torch.int64)], dim = 1)
     res = self.model.forward(input_ids, attention_mask = attention_mask, past_key_values = past_key_values, use_cache = True, return_dict = True)
     logits = res.logits[:,-1,:] # logits.shape = (batch, vocab_size)
-    return logits, past_key_values
+    hidden = res.hidden_states[:,-1,:] # hidden.shape = (batch, hidden_dim)
+    return logits, hidden, past_key_values
